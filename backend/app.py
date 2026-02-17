@@ -1,20 +1,26 @@
 from flask import Flask, request, jsonify
-import joblib
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
-model = joblib.load("sales_model.pkl")
+CORS(app)   # allow Flutter web requests
 
 @app.route("/")
 def home():
-    return "Backend running in browser"
+    return "Backend is running"
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    print("Predict API called")
+
     data = request.get_json()
-    prediction = model.predict([[data["quantity"], data["price"]]])
-    return jsonify({"predicted_sales": int(prediction[0])})
+    quantity = data.get("quantity", 0)
+    price = data.get("price", 0)
+
+    prediction = quantity * price  # simple logic
+
+    return jsonify({
+        "prediction": prediction
+    })
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
