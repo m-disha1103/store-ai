@@ -30,7 +30,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedProduct = "Product A";
-
+  final String baseUrl = "http://192.168.29.126:5000";
   List<Map<String, String>> history = [];
 
   List<String> products = [
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
+      if (data.containsKey("prediction")) {
         setState(() {
           result = "Predicted Sales: ₹ ${data['prediction']}";
 
@@ -85,6 +85,9 @@ class _HomePageState extends State<HomePage> {
         });
       } else {
         showError("Server Error (${response.statusCode})");
+      }
+      } else {
+      showError("Server Error: ${response.statusCode}");
       }
     } catch (e) {
       showError("Backend not reachable");
