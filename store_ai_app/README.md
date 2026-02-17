@@ -1,16 +1,18 @@
-# store_ai_app
+🛒 AI-Powered Store Management App
+📌 Project Overview
 
-A new Flutter project.
+The AI-Powered Store Management App is a smart inventory and billing system that uses Machine Learning to predict product demand and help store owners manage stock efficiently.
 
-## Getting Started
+The app allows users to:
+1.Add products dynamically
+2.View product list
+3.Get AI-based demand prediction
+4.Store transaction history
+5.Connect frontend (Flutter app) with backend (Flask API)
 
-This project is a starting point for a Flutter application.
+This project demonstrates full-stack development with AI integration.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+🎯 Objective
+To build a mobile application that:
+1.Automates product management
+2.Uses AI to predict
