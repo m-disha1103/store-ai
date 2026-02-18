@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 void main() {
   runApp(const StoreAIApp());
@@ -45,6 +47,32 @@ class _HomePageState extends State<HomePage> {
   String result = "";
   bool isLoading = false;
 
+  @override
+void initState() {
+  super.initState();
+  loadHistory();
+}
+
+  Future<void> saveHistory() async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String> historyList =
+      history.map((item) => jsonEncode(item)).toList();
+  await prefs.setStringList('sales_history', historyList);
+}
+
+Future<void> loadHistory() async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String>? historyList = prefs.getStringList('sales_history');
+
+  if (historyList != null) {
+    setState(() {
+      history = historyList
+          .map((item) => Map<String, String>.from(jsonDecode(item)))
+          .toList();
+    });
+  }
+}
+  
   Future<void> predictSales() async {
     if (!_formKey.currentState!.validate()) return;
 
