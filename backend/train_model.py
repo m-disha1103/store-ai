@@ -1,14 +1,18 @@
 import pandas as pd
+import numpy as np
 from sklearn.linear_model import LinearRegression
-import joblib
+import pickle
 
+# Create dummy training data
 data = {
-    "quantity": [5, 10, 15, 20, 25],
-    "price": [100, 100, 100, 100, 100],
-    "sales": [500, 1000, 1500, 2000, 2500]
+    "quantity": [10, 20, 30, 40, 50],
+    "price": [100, 200, 150, 300, 250],
 }
 
 df = pd.DataFrame(data)
+
+# Sales = quantity * price
+df["sales"] = df["quantity"] * df["price"]
 
 X = df[["quantity", "price"]]
 y = df["sales"]
@@ -16,6 +20,7 @@ y = df["sales"]
 model = LinearRegression()
 model.fit(X, y)
 
-joblib.dump(model, "sales_model.pkl")
+# Save model
+pickle.dump(model, open("sales_model.pkl", "wb"))
 
-print("Model trained and saved")
+print("Model trained and saved successfully!")
