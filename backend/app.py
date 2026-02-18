@@ -3,22 +3,24 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)   # allow Flutter web requests
-
+# Home route (for testing)
 @app.route("/")
 def home():
     return "Backend is running"
 
+#prediction route 
 @app.route("/predict", methods=["POST"])
 def predict():
-    print("Predict API called")
-
     data = request.get_json()
-    quantity = data.get("quantity", 0)
-    price = data.get("price", 0)
+
+    product = data.get("product")
+    quantity = data.get("quantity")
+    price = data.get("price")
 
     prediction = quantity * price  # simple logic
 
     return jsonify({
+        "product": product,
         "prediction": prediction
     })
 
