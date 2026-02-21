@@ -35,9 +35,7 @@ class _HomePageState extends State<HomePage> {
 
   List<Map<String, String>> history = [];
 
-  List<String> products = [
-    "Product A",
-  ];
+  List<String> products = ["Product A"];
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController quantityController = TextEditingController();
@@ -56,8 +54,7 @@ class _HomePageState extends State<HomePage> {
   // ✅ SAVE HISTORY
   Future<void> saveHistory() async {
     final prefs = await SharedPreferences.getInstance();
-    List<String> historyList =
-        history.map((item) => jsonEncode(item)).toList();
+    List<String> historyList = history.map((item) => jsonEncode(item)).toList();
     await prefs.setStringList('sales_history', historyList);
   }
 
@@ -132,9 +129,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void addProduct() {
@@ -169,10 +166,7 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF1E1E2C),
-              Color(0xFF2D2D44),
-            ],
+            colors: [Color(0xFF1E1E2C), Color(0xFF2D2D44)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -187,8 +181,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   const SizedBox(height: 20),
 
-                  const Icon(Icons.auto_graph,
-                      size: 70, color: Colors.white),
+                  const Icon(Icons.auto_graph, size: 70, color: Colors.white),
 
                   const SizedBox(height: 10),
 
@@ -209,13 +202,11 @@ class _HomePageState extends State<HomePage> {
                       Expanded(
                         child: TextFormField(
                           controller: productController,
-                          style:
-                              const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                           decoration: const InputDecoration(
                             labelText: "Add New Product",
                             border: OutlineInputBorder(),
-                            prefixIcon:
-                                Icon(Icons.add_box_outlined),
+                            prefixIcon: Icon(Icons.add_box_outlined),
                           ),
                         ),
                       ),
@@ -232,14 +223,12 @@ class _HomePageState extends State<HomePage> {
                   /// PRODUCT DROPDOWN
                   DropdownButtonFormField<String>(
                     dropdownColor: Colors.black87,
-                    value: selectedProduct,
-                    style:
-                        const TextStyle(color: Colors.white),
+                    initialValue: selectedProduct,
+                    style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       labelText: "Select Product",
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(
-                          Icons.inventory_2_outlined),
+                      prefixIcon: Icon(Icons.inventory_2_outlined),
                     ),
                     items: products.map((product) {
                       return DropdownMenuItem(
@@ -260,13 +249,11 @@ class _HomePageState extends State<HomePage> {
                   TextFormField(
                     controller: quantityController,
                     keyboardType: TextInputType.number,
-                    style:
-                        const TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       labelText: "Quantity",
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(
-                          Icons.format_list_numbered),
+                      prefixIcon: Icon(Icons.format_list_numbered),
                     ),
                     validator: (value) {
                       if (value == null ||
@@ -284,16 +271,14 @@ class _HomePageState extends State<HomePage> {
                   /// PRICE
                   TextFormField(
                     controller: priceController,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(
-                            decimal: true),
-                    style:
-                        const TextStyle(color: Colors.white),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       labelText: "Price",
                       border: OutlineInputBorder(),
-                      prefixIcon:
-                          Icon(Icons.currency_rupee),
+                      prefixIcon: Icon(Icons.currency_rupee),
                     ),
                     validator: (value) {
                       if (value == null ||
@@ -314,25 +299,20 @@ class _HomePageState extends State<HomePage> {
                     height: 55,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.deepPurple,
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(15),
+                        backgroundColor: Colors.deepPurple,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      onPressed:
-                          isLoading ? null : predictSales,
+                      onPressed: isLoading ? null : predictSales,
                       child: isLoading
-                          ? const CircularProgressIndicator(
-                              color: Colors.white)
+                          ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
                               "Predict Sales",
                               style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight:
-                                      FontWeight.bold),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                     ),
                   ),
@@ -342,22 +322,17 @@ class _HomePageState extends State<HomePage> {
                   /// RESULT CARD
                   if (result.isNotEmpty)
                     Container(
-                      padding:
-                          const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white
-                            .withOpacity(0.08),
-                        borderRadius:
-                            BorderRadius.circular(20),
-                        border: Border.all(
-                            color: Colors.white24),
+                        color: Colors.white.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white24),
                       ),
                       child: Column(
                         children: [
                           const Icon(
                             Icons.check_circle,
-                            color:
-                                Colors.greenAccent,
+                            color: Colors.greenAccent,
                             size: 40,
                           ),
                           const SizedBox(height: 10),
@@ -365,8 +340,7 @@ class _HomePageState extends State<HomePage> {
                             result,
                             style: const TextStyle(
                               fontSize: 18,
-                              fontWeight:
-                                  FontWeight.bold,
+                              fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
@@ -384,8 +358,7 @@ class _HomePageState extends State<HomePage> {
                         "Prediction History",
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight:
-                              FontWeight.bold,
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
@@ -393,64 +366,39 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 15),
                     ListView.builder(
                       shrinkWrap: true,
-                      physics:
-                          const NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: history.length,
-                      itemBuilder:
-                          (context, index) {
-                        final item =
-                            history[index];
+                      itemBuilder: (context, index) {
+                        final item = history[index];
                         return Container(
-                          margin:
-                              const EdgeInsets.only(
-                                  bottom: 15),
-                          padding:
-                              const EdgeInsets.all(
-                                  15),
-                          decoration:
-                              BoxDecoration(
-                            color: Colors.white
-                                .withOpacity(0.05),
-                            borderRadius:
-                                BorderRadius
-                                    .circular(15),
-                            border: Border.all(
-                                color: Colors
-                                    .white24),
+                          margin: const EdgeInsets.only(bottom: 15),
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: Colors.white24),
                           ),
                           child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 item["product"]!,
-                                style:
-                                    const TextStyle(
-                                  fontWeight:
-                                      FontWeight
-                                          .bold,
-                                  color:
-                                      Colors.white,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(
-                                  height: 5),
+                              const SizedBox(height: 5),
                               Text(
                                 "Qty: ${item["quantity"]} | Price: ₹${item["price"]}",
-                                style:
-                                    const TextStyle(
-                                        color: Colors
-                                            .white70),
+                                style: const TextStyle(color: Colors.white70),
                               ),
-                              const SizedBox(
-                                  height: 5),
+                              const SizedBox(height: 5),
                               Text(
                                 "Prediction: ₹${item["result"]}",
-                                style:
-                                    const TextStyle(
-                                        color: Colors
-                                            .greenAccent),
+                                style: const TextStyle(
+                                  color: Colors.greenAccent,
+                                ),
                               ),
                             ],
                           ),
