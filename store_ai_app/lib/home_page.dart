@@ -1,31 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'home_page.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(const StoreAIApp());
-}
-
-class StoreAIApp extends StatelessWidget {
-  const StoreAIApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'AI Store Management',
-      theme: ThemeData(useMaterial3: true),
-      darkTheme: ThemeData.dark(useMaterial3: true),
-      themeMode: ThemeMode.dark,
-      home: const HomePage(),
-    );
-  }
-}
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -54,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    loadHistoryFromFirestore();
+    loadHistory();
   }
 
   @override
@@ -65,8 +42,8 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  /// Load history from Firestore
-  Future<void> loadHistoryFromFirestore() async {
+  /// Load history from Firebase first, fallback to local storage
+  Future<void> loadHistory() async {
     try {
       final snapshot = await _firestore
           .collection('sales_history')
@@ -75,24 +52,36 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         history = snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           return {
-            "product": (data['product'] ?? '').toString(),
-            "quantity": (data['quantity'] ?? '').toString(),
-            "price": (data['price'] ?? '').toString(),
-            "result": (data['result'] ?? '').toString(),
+            "product": data['product'] ?? '',
+            "quantity": data['quantity'] ?? '',
+            "price": data['price'] ?? '',
+            "result": data['result'] ?? '',
           };
         }).toList();
       });
+
+      // Save a local backup
+      await saveHistoryLocally();
     } catch (e) {
-      showError("Failed to load history from Firestore");
+      // Firebase failed → fallback to local storage
+      final prefs = await SharedPreferences.getInstance();
+      final List<String>? historyList = prefs.getStringList('sales_history');
+      if (historyList != null) {
+        setState(() {
+          history = historyList
+              .map((item) => Map<String, String>.from(jsonDecode(item)))
+              .toList();
+        });
+      }
     }
   }
 
-  /// Optional: Save local backup
-  Future<void> saveHistory() async {
+  /// Save to SharedPreferences locally
+  Future<void> saveHistoryLocally() async {
     final prefs = await SharedPreferences.getInstance();
-    List<String> historyList =
+    final List<String> historyList =
         history.map((item) => jsonEncode(item)).toList();
     await prefs.setStringList('sales_history', historyList);
   }
@@ -134,17 +123,17 @@ class _HomePageState extends State<HomePage> {
             "timestamp": FieldValue.serverTimestamp(),
           };
 
-          // Update local history
+          // Update local history in UI
           setState(() {
             result = "Predicted Sales: ₹ ${data['prediction']}";
             history.insert(0, dataMap);
           });
 
-          // Save to Firestore
+          // Save to Firebase
           await _firestore.collection('sales_history').add(dataMap);
 
-          // Optional: local backup
-          await saveHistory();
+          // Save local backup
+          await saveHistoryLocally();
         } else {
           showError("Invalid response from server");
         }
@@ -152,7 +141,22 @@ class _HomePageState extends State<HomePage> {
         showError("Server Error: ${response.statusCode}");
       }
     } catch (e) {
-      showError("Backend not reachable");
+      showError("Backend not reachable, saved locally");
+      // Save locally only if Firebase fails
+      final dataMap = {
+        "product": selectedProduct,
+        "quantity": quantityController.text,
+        "price": priceController.text,
+        "result": "Offline",
+        "timestamp": DateTime.now().toIso8601String(),
+      };
+      setState(() {
+        history.insert(0, dataMap);
+      });
+      await saveHistoryLocally();
+      setState(() {
+        result = "Saved locally (offline)";
+      });
     }
 
     setState(() {
@@ -167,7 +171,6 @@ class _HomePageState extends State<HomePage> {
 
   void addProduct() {
     if (productController.text.trim().isEmpty) return;
-
     setState(() {
       products.add(productController.text.trim());
       selectedProduct = productController.text.trim();
